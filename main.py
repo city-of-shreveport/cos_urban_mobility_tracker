@@ -188,7 +188,7 @@ def track_camera(args, filetimestamp, interpreter, tracker, labels, colors):
 
     # initialize the video stream and allow the camera sensor to warmup
     print("> starting video stream...")
-    vs = VideoStream(src="https://s2.ozarkstrafficoneview.com/preroll/CAM83/playlist.m3u8").start()
+    vs = VideoStream(src=0).start()
     time.sleep(2.0)
 
     # loop over the frames from the video stream
