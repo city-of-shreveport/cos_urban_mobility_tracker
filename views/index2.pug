@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #[em CommunityServicePortal], a place to get and/or give help.
+
+  h1 Dynamic content
+
+  if error
+    p Error getting dynamic content.
+  else
+    p The library has the following record counts:
+
+    ul
+      li #[strong Resources:] !{data.resource_count}
+      li #[strong Users:] !{data.user_count}

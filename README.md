@@ -74,3 +74,4 @@ python main.py -imageseq data/images/PETS09-S2L1/ -tpu
 - [ ] Implement an efficient mobile version of Deep SORT [arxiv]
 - [ ] Finish designing mounting hardware
 - [ ] Create example data processing notebooks
+# cos_urban_mobility_tracker

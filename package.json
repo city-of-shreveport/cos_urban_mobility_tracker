@@ -1,0 +1,27 @@
+{
+  "name": "get-give-help",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "devstart": "nodemon ./bin/www",
+    "serverstart": "DEBUG=get-give-help:* npm run devstart"
+  },
+  "dependencies": {
+    "async": "^3.2.0",
+    "canvas": "^2.6.1",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "node-rtsp-stream": "0.0.9",
+    "pg": "^7.18.2",
+    "pug": "2.0.0-beta11",
+    "regexp": "^1.0.0",
+    "sequelize": "^5.21.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}

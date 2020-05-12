@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  h1= title
+
+  h1 Dynamic content
+
+  if error
+    p Error getting dynamic content.
+  else
+    img(src=#(lastframe))

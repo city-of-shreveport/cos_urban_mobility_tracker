@@ -19,10 +19,8 @@ from matplotlib.patches import Rectangle
 
 import os
 import re
-import streamlit as st
 
 import tensorflow as tf
-from tensorfow.Model import Model
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -97,7 +95,9 @@ def persist_image_output(pil_img, trackers, tracker_labels, tracker_scores, colo
         rect = Rectangle((d[0],d[1]),d[2]-d[0],d[3]-d[1], fill=False, lw=2, ec=colors[d[4]%32,:])
         ax.add_patch(rect)
 
-    plt.savefig('output/frame_{}.jpg'.format(frame))
+    framename = 'output/frame_{}.jpg'.format(frame)
+    plt.savefig(framename)
+    return framename
 
 def timestamp():
     timestamp = str(datetime.datetime.now())
@@ -175,20 +175,26 @@ def track_video(args, interpreter, tracker, labels, colors):
                 persist_image_output(pil_img, trackers, tracker_labels, tracker_scores, colors, counter)
 
             # save object locations
-            for d, tracker_label, tracker_score in zip(trackers, tracker_labels, tracker_scores):
-                out_file.write('{},{},{},{},{},{},{},{}'.format(frame,d[4],d[0],d[1],d[2]-d[0],d[3]-d[1],tracker_label,tracker_score))
+            #for d, tracker_label, tracker_score in zip(trackers, tracker_labels, tracker_scores):
+
+            if counter%60==0:
+                traffic_counter += len(trackers)
+                with open('object_count'+ filetimestamp + '.csv', 'a+') as out_file:
+                    for d, tracker_label, tracker_score in zip(trackers, tracker_labels, tracker_scores):
+                        #out_file.write('{},{},{},{},{},{},{},{}'.format(frame,d[4],d[0],d[1],d[2]-d[0],d[3]-d[1],tracker_label,tracker_score))
+                        out_file.write(','+str(traffic_counter)+','+timestamp()+"\n")
 
             counter += 1
 
             if counter >= args.nframes: break
-            if cv2.waitKey(1) & 0xFF == ord('q'): break
+            if cv2.waitKey(1) & 0xFF == ord('c'): break
 
 
 def track_camera(args, filetimestamp, interpreter, tracker, labels, colors):
 
     # initialize the video stream and allow the camera sensor to warmup
     print("> starting video stream...")
-    vs = VideoStream(src=0).start()
+    vs = cv2.VideoCapture(args.camera_path)#args.camera_path)
     time.sleep(2.0)
 
     # loop over the frames from the video stream
@@ -198,7 +204,7 @@ def track_camera(args, filetimestamp, interpreter, tracker, labels, colors):
         print(counter)
 
             # pull frame from video stream
-        frame = vs.read()
+        ret, frame = vs.read()
 
             # array to PIL image format
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -260,10 +266,7 @@ def main(args):
 
     if not args.tpu:
         print('TPU = NO')
-        buf = open('you-tflite-file', 'rb').read()
-        buf = bytearray(buf)
-        model = Model.getRootAsModel(buf, 0)
-        interpreter = tf.lite.Interpreter(model_path=model)
+        interpreter = tf.lite.Interpreter(model_path='models/tflite/coco_ssd_mobilenet_v1_1.0_quant_2018_06_29/detect.tflite')
         interpreter.allocate_tensors()
 
         # parse label map
@@ -296,7 +299,7 @@ def main(args):
         track_image_seq(args, interpreter, tracker, labels, colors)
 
     # track objects from camera source
-    if args.camera:
+    if args.camera_path:
         track_camera(args, filetimestamp, interpreter, tracker, labels, colors)
 
     pass
@@ -310,7 +313,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='--- Raspbery Pi Urban Mobility Tracker ---')
     parser.add_argument('-imageseq', dest='image_path', type=str, required=False, help='specify an image sequence')
     parser.add_argument('-video', dest='video_path', type=str, required=False, help='specify video file')
-    parser.add_argument('-camera', dest='camera', default=False, action='store_true', help='specify this when using the rpi camera as the input')
+    parser.add_argument('-camera', dest='camera_path', type=str, default='rtsp://admin:admin@192.168.1.18/cam1/mpeg4', required=False, help='specify this when using a camera feed as the input')
     parser.add_argument('-threshold', dest='threshold', type=float, default=0.5, required=False, help='specify a custom inference threshold')
     parser.add_argument('-tpu', dest='tpu', required=False, default=False, action='store_true', help='add this when using a coral usb accelerator')
     parser.add_argument('-nframes', dest='nframes', type=int, required=False, default=10, help='specify nunber of frames to process')
