@@ -194,6 +194,9 @@ def track_camera(args, filetimestamp, interpreter, tracker, labels, colors):
 
     # initialize the video stream and allow the camera sensor to warmup
     print("> starting video stream...")
+    check_for_nonint = re.compile(r"\D")
+    if not check_for_nonint.search(args.camera_path):
+        args.camera_path = int(args.camera_path)
     vs = cv2.VideoCapture(args.camera_path)#args.camera_path)
     time.sleep(2.0)
 
@@ -313,7 +316,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='--- Raspbery Pi Urban Mobility Tracker ---')
     parser.add_argument('-imageseq', dest='image_path', type=str, required=False, help='specify an image sequence')
     parser.add_argument('-video', dest='video_path', type=str, required=False, help='specify video file')
-    parser.add_argument('-camera', dest='camera_path', type=str, default='rtsp://admin:admin@192.168.1.18/cam1/mpeg4', required=False, help='specify this when using a camera feed as the input')
+    parser.add_argument('-camera', dest='camera_path', type=str, required=False, help='specify this when using a camera feed as the input')
     parser.add_argument('-threshold', dest='threshold', type=float, default=0.5, required=False, help='specify a custom inference threshold')
     parser.add_argument('-tpu', dest='tpu', required=False, default=False, action='store_true', help='add this when using a coral usb accelerator')
     parser.add_argument('-nframes', dest='nframes', type=int, required=False, default=10, help='specify nunber of frames to process')
