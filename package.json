@@ -17,7 +17,7 @@
     "morgan": "~1.9.1",
     "node-rtsp-stream": "0.0.9",
     "pg": "^7.18.2",
-    "pug": "2.0.0-beta11",
+    "pug": "3.0.1",
     "regexp": "^1.0.0",
     "sequelize": "^5.21.5"
   },
